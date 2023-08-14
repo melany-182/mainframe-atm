@@ -142,10 +142,21 @@ public class App {
             System.out.println("Cantidad no válida.");
         } else {
             saldo += cantidad;
-            String query = "UPDATE usuarios SET saldo = ? WHERE id = " + usuarioId + " AND pin = " + pinActual;
+            String query1 = "UPDATE usuarios SET saldo = ? WHERE id = " + usuarioId + " AND pin = " + pinActual;
             try {
-                PreparedStatement preparedStatement = connection.prepareStatement(query);
+                PreparedStatement preparedStatement = connection.prepareStatement(query1);
                 preparedStatement.setDouble(1, saldo);
+                preparedStatement.executeUpdate();
+                preparedStatement.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            String query2 = "INSERT INTO historico (usuario_id, tipo_operacion, cantidad) VALUES (?, ?, ?)";
+            try {
+                PreparedStatement preparedStatement = connection.prepareStatement(query2);
+                preparedStatement.setInt(1, usuarioId);
+                preparedStatement.setString(2, "depósito");
+                preparedStatement.setDouble(3, cantidad);
                 preparedStatement.executeUpdate();
                 preparedStatement.close();
             } catch (Exception e) {
@@ -167,10 +178,21 @@ public class App {
             System.out.println("Saldo insuficiente.");
         } else {
             saldo -= cantidad;
-            String query = "UPDATE usuarios SET saldo = ? WHERE id = " + usuarioId + " AND pin = " + pinActual;
+            String query1 = "UPDATE usuarios SET saldo = ? WHERE id = " + usuarioId + " AND pin = " + pinActual;
             try {
-                PreparedStatement preparedStatement = connection.prepareStatement(query);
+                PreparedStatement preparedStatement = connection.prepareStatement(query1);
                 preparedStatement.setDouble(1, saldo);
+                preparedStatement.executeUpdate();
+                preparedStatement.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            String query2 = "INSERT INTO historico (usuario_id, tipo_operacion, cantidad) VALUES (?, ?, ?)";
+            try {
+                PreparedStatement preparedStatement = connection.prepareStatement(query2);
+                preparedStatement.setInt(1, usuarioId);
+                preparedStatement.setString(2, "retiro");
+                preparedStatement.setDouble(3, cantidad);
                 preparedStatement.executeUpdate();
                 preparedStatement.close();
             } catch (Exception e) {
@@ -194,10 +216,21 @@ public class App {
 
             if (nuevoPin == confirmacionPin) {
                 pinActual = nuevoPin;
-                String query = "UPDATE usuarios SET pin = ? WHERE id = " + usuarioId;
+                String query1 = "UPDATE usuarios SET pin = ? WHERE id = " + usuarioId;
                 try {
-                    PreparedStatement preparedStatement = connection.prepareStatement(query);
+                    PreparedStatement preparedStatement = connection.prepareStatement(query1);
                     preparedStatement.setInt(1, pinActual);
+                    preparedStatement.executeUpdate();
+                    preparedStatement.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                String query2 = "INSERT INTO historico (usuario_id, tipo_operacion, cantidad) VALUES (?, ?, ?)";
+                try {
+                    PreparedStatement preparedStatement = connection.prepareStatement(query2);
+                    preparedStatement.setInt(1, usuarioId);
+                    preparedStatement.setString(2, "cambio de PIN");
+                    preparedStatement.setDouble(3, 0);
                     preparedStatement.executeUpdate();
                     preparedStatement.close();
                 } catch (Exception e) {
