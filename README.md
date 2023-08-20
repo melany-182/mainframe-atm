@@ -99,3 +99,6 @@ use atm;
 
 5. Ejecutan el script init.sql de la carpeta database.
 
+## Mockups realizados en Balsamiq Cloud
+
+[Maquetado de la interfaz gráfica del ATM](https://balsamiq.cloud/sr6rry4/pkkbwmx)
