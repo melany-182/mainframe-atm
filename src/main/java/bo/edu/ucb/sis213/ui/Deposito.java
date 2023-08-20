@@ -1,6 +1,10 @@
 package bo.edu.ucb.sis213.ui;
 
 import javax.swing.*;
+import javax.swing.text.AbstractDocument;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DocumentFilter;
 import bo.edu.ucb.sis213.bbdd.Conexion;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -41,7 +45,38 @@ public class Deposito extends JFrame {
 		label_2.setBounds(152, 146, 32, 30);
 		getContentPane().add(label_2);
 
-		txtCantidad = new JTextField(20); // TODO: restringir input a DOUBLE
+		txtCantidad = new JTextField(20);
+		((AbstractDocument) txtCantidad.getDocument()).setDocumentFilter(new DocumentFilter() {
+			@Override
+			public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr)
+					throws BadLocationException {
+				if (isValid(fb.getDocument().getText(0, fb.getDocument().getLength()) + string)) {
+					super.insertString(fb, offset, string, attr);
+				}
+			}
+
+			@Override
+			public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs)
+					throws BadLocationException {
+				if (isValid(fb.getDocument().getText(0, fb.getDocument().getLength()).substring(0, offset) + text
+						+ fb.getDocument().getText(0, fb.getDocument().getLength()).substring(offset + length))) {
+					super.replace(fb, offset, length, text, attrs);
+				}
+			}
+
+			private boolean isValid(String text) {
+				if (text.isEmpty())
+					return true;
+				if (text.equals("."))
+					return true;
+				try {
+					Double.parseDouble(text);
+					return true;
+				} catch (NumberFormatException e) {
+					return false;
+				}
+			}
+		});
 		txtCantidad.setHorizontalAlignment(SwingConstants.CENTER);
 		txtCantidad.setBounds(175, 146, 100, 30);
 		getContentPane().add(txtCantidad);

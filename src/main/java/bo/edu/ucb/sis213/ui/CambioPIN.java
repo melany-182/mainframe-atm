@@ -12,6 +12,10 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.SwingConstants;
+import javax.swing.text.AbstractDocument;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DocumentFilter;
 import bo.edu.ucb.sis213.bbdd.Conexion;
 import javax.swing.JPasswordField;
 
@@ -42,7 +46,24 @@ public class CambioPIN extends JFrame {
 		label_1.setBounds(80, 106, 150, 30);
 		getContentPane().add(label_1);
 
-		passwordField_0 = new JPasswordField(); // TODO: restringir input a INT
+		passwordField_0 = new JPasswordField();
+		((AbstractDocument) passwordField_0.getDocument()).setDocumentFilter(new DocumentFilter() {
+			@Override
+			public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr)
+					throws BadLocationException {
+				if (string.matches("\\d*")) {
+					super.insertString(fb, offset, string, attr);
+				}
+			}
+
+			@Override
+			public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs)
+					throws BadLocationException {
+				if (text.matches("\\d*")) {
+					super.replace(fb, offset, length, text, attrs);
+				}
+			}
+		});
 		passwordField_0.setBounds(255, 106, 115, 30);
 		getContentPane().add(passwordField_0);
 
@@ -50,7 +71,24 @@ public class CambioPIN extends JFrame {
 		label_2.setBounds(80, 146, 150, 30);
 		getContentPane().add(label_2);
 
-		passwordField_1 = new JPasswordField(); // TODO: restringir input a INT
+		passwordField_1 = new JPasswordField();
+		((AbstractDocument) passwordField_1.getDocument()).setDocumentFilter(new DocumentFilter() {
+			@Override
+			public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr)
+					throws BadLocationException {
+				if (string.matches("\\d*")) {
+					super.insertString(fb, offset, string, attr);
+				}
+			}
+
+			@Override
+			public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs)
+					throws BadLocationException {
+				if (text.matches("\\d*")) {
+					super.replace(fb, offset, length, text, attrs);
+				}
+			}
+		});
 		passwordField_1.setBounds(255, 146, 115, 30);
 		getContentPane().add(passwordField_1);
 
@@ -58,7 +96,24 @@ public class CambioPIN extends JFrame {
 		label_3.setBounds(80, 186, 150, 30);
 		getContentPane().add(label_3);
 
-		passwordField_2 = new JPasswordField(); // TODO: restringir input a INT
+		passwordField_2 = new JPasswordField();
+		((AbstractDocument) passwordField_2.getDocument()).setDocumentFilter(new DocumentFilter() {
+			@Override
+			public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr)
+					throws BadLocationException {
+				if (string.matches("\\d*")) {
+					super.insertString(fb, offset, string, attr);
+				}
+			}
+
+			@Override
+			public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs)
+					throws BadLocationException {
+				if (text.matches("\\d*")) {
+					super.replace(fb, offset, length, text, attrs);
+				}
+			}
+		});
 		passwordField_2.setBounds(255, 186, 115, 30);
 		getContentPane().add(passwordField_2);
 

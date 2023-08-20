@@ -1,6 +1,10 @@
 package bo.edu.ucb.sis213.ui;
 
 import javax.swing.*;
+import javax.swing.text.AbstractDocument;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DocumentFilter;
 import bo.edu.ucb.sis213.bbdd.Conexion;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -41,7 +45,24 @@ public class Login extends JFrame {
 		label_2.setBounds(120, 170, 25, 30);
 		getContentPane().add(label_2);
 
-		txtPIN = new JPasswordField(20); // TODO: restringir input a INT
+		txtPIN = new JPasswordField(20);
+		((AbstractDocument) txtPIN.getDocument()).setDocumentFilter(new DocumentFilter() {
+			@Override
+			public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr)
+					throws BadLocationException {
+				if (string.matches("\\d*")) {
+					super.insertString(fb, offset, string, attr);
+				}
+			}
+
+			@Override
+			public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs)
+					throws BadLocationException {
+				if (text.matches("\\d*")) {
+					super.replace(fb, offset, length, text, attrs);
+				}
+			}
+		});
 		txtPIN.setBounds(200, 170, 130, 30);
 		getContentPane().add(txtPIN);
 
@@ -102,6 +123,7 @@ public class Login extends JFrame {
 			} else {
 				JOptionPane.showMessageDialog(this, "El usuario ingresado no existe.", "Usuario no encontrado",
 						JOptionPane.INFORMATION_MESSAGE);
+				txtPIN.setText("");
 			}
 
 		} catch (Exception e) {
