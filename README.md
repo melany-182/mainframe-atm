@@ -47,7 +47,15 @@ Desarrollar un programa interactivo en línea de comandos que simule las operaci
     * Mostrar un mensaje de despedida y cerrar el programa.
 
 
+## Arquitectura de la aplicación
 
+El software tiene una arquitectura en capas:
+
+ - view: capa de presentación, en este caso es una aplicación Swing. Todas las clases que tienen componentes Swing están en este paquete.
+ - bl: capa de lógica de negocio, en este caso es una aplicación Java. Todas las clases que tienen lógica de negocio están en este paquete.
+ - dao: capa de acceso a datos, en este caso es una aplicación Java. Todas las clases que tienen acceso a datos están en este paquete.
+ - utils: capa de utilidades, en este caso es una aplicación Java. Todas las clases que tienen utilidades están en este paquete.
+ 
 ## Requerimientos
 
 Para correr este proyecto debe tener instalado:

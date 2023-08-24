@@ -1,12 +1,8 @@
-package bo.edu.ucb.sis213.ui;
+package bo.edu.ucb.sis213.view;
 
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -16,20 +12,20 @@ import javax.swing.text.AbstractDocument;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DocumentFilter;
-import bo.edu.ucb.sis213.bbdd.Conexion;
+import bo.edu.ucb.sis213.bl.AppBl;
 import javax.swing.JPasswordField;
 
 public class CambioPIN extends JFrame {
 	private JButton btnCancelar;
 	private JButton btnCambiarPIN;
-
-	private int usuarioId;
 	private JPasswordField passwordField_0;
 	private JPasswordField passwordField_1;
 	private JPasswordField passwordField_2;
 
-	public CambioPIN(int id) {
-		usuarioId = id;
+	private AppBl appBl;
+
+	public CambioPIN(AppBl appBl) {
+		this.appBl = appBl;
 
 		setTitle("Cambiar PIN");
 		setBounds(100, 100, 450, 350);
@@ -141,7 +137,7 @@ public class CambioPIN extends JFrame {
 	}
 
 	private void llamarAMenuPrincipal() {
-		MenuPrincipal frame = new MenuPrincipal(usuarioId);
+		MenuPrincipal frame = new MenuPrincipal(appBl);
 		frame.setVisible(true);
 		frame.setLocationRelativeTo(null);
 		this.dispose();
@@ -151,71 +147,29 @@ public class CambioPIN extends JFrame {
 		String pinActual = new String(passwordField_0.getPassword());
 		String nuevoPin = new String(passwordField_1.getPassword());
 		String confirmacionNuevoPin = new String(passwordField_2.getPassword());
-		int pinBD = 0;
-		Conexion con = new Conexion();
-		Connection connection = null;
 
 		try {
-			connection = (Connection) con.getConnection();
-		} catch (SQLException e) {
-			System.err.println("No se puede conectar a Base de Datos");
-			e.printStackTrace();
-			System.exit(1);
-		}
-
-		try {
-			String query = "SELECT * FROM usuarios WHERE id = ?";
-			PreparedStatement preparedStatement = connection.prepareStatement(query);
-			preparedStatement.setInt(1, usuarioId);
-			ResultSet resultSet = preparedStatement.executeQuery();
-
-			if (resultSet.next()) {
-				pinBD = resultSet.getInt("pin");
-			} else {
-				throw new SQLException();
-			}
-
-			if (pinActual.equals(String.valueOf(pinBD))) {
-				if (nuevoPin.equals(confirmacionNuevoPin)) {
-					// actualización de pin
-					query = "UPDATE usuarios SET pin = ? WHERE id = ?";
-					preparedStatement = connection.prepareStatement(query);
-					preparedStatement.setInt(1, Integer.valueOf(nuevoPin));
-					preparedStatement.setInt(2, usuarioId);
-					preparedStatement.executeUpdate();
-					preparedStatement.close();
-
-					// registro en histórico
-					query = "INSERT INTO historico(usuario_id, tipo_operacion, cantidad) VALUES (?, 'cambio de pin', ?)";
-					preparedStatement = connection.prepareStatement(query);
-					preparedStatement.setInt(1, usuarioId);
-					preparedStatement.setDouble(2, 0);
-					preparedStatement.executeUpdate();
-					preparedStatement.close();
-
-					JOptionPane.showMessageDialog(this, "PIN actualizado con éxito.", "Cambio de PIN exitoso",
-							JOptionPane.INFORMATION_MESSAGE);
-					MenuPrincipal frame = new MenuPrincipal(usuarioId);
-					frame.setVisible(true);
-					frame.setLocationRelativeTo(null);
-					this.dispose();
-				} else {
-					JOptionPane.showMessageDialog(this, "Error al cambiar el PIN. Los PINs no coinciden.",
-							"Cambio de PIN fallido", JOptionPane.INFORMATION_MESSAGE);
-					passwordField_0.setText("");
-					passwordField_1.setText("");
-					passwordField_2.setText("");
-				}
-			} else {
-				JOptionPane.showMessageDialog(this, "Error al cambiar el PIN. PIN incorrecto.", "Cambio de PIN fallido",
-						JOptionPane.INFORMATION_MESSAGE);
-				passwordField_0.setText("");
-				passwordField_1.setText("");
-				passwordField_2.setText("");
-			}
-
+			appBl.cambiarPIN(pinActual, nuevoPin, confirmacionNuevoPin);
+			JOptionPane.showMessageDialog(this, "PIN actualizado con éxito.", "Cambio de PIN exitoso",
+					JOptionPane.INFORMATION_MESSAGE);
+			
+			MenuPrincipal frame = new MenuPrincipal(appBl);
+			frame.setVisible(true);
+			frame.setLocationRelativeTo(null);
+			this.dispose();
 		} catch (Exception e) {
-			e.printStackTrace();
+			// TODO: gestionar JOptionPane's
+			JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+			passwordField_0.setText("");
+			passwordField_1.setText("");
+			passwordField_2.setText("");
 		}
+		/*
+			JOptionPane.showMessageDialog(this, "Error al cambiar el PIN. Los PINs no coinciden.",
+				"Cambio de PIN fallido", JOptionPane.INFORMATION_MESSAGE);
+
+			JOptionPane.showMessageDialog(this, "Error al cambiar el PIN. PIN incorrecto.", "Cambio de PIN fallido",
+				JOptionPane.INFORMATION_MESSAGE);
+		*/
 	}
 }

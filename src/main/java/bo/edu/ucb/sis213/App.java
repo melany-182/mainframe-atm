@@ -1,7 +1,7 @@
 package bo.edu.ucb.sis213;
 
 import java.awt.EventQueue;
-import bo.edu.ucb.sis213.ui.Login;
+import bo.edu.ucb.sis213.view.Login;
 
 public class App {
 	public static void main(String[] args) {

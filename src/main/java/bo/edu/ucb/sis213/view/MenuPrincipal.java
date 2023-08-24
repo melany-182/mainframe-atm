@@ -1,13 +1,10 @@
-package bo.edu.ucb.sis213.ui;
+package bo.edu.ucb.sis213.view;
 
 import javax.swing.*;
-import bo.edu.ucb.sis213.bbdd.Conexion;
+import bo.edu.ucb.sis213.bl.AppBl;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.math.BigDecimal;
 
 public class MenuPrincipal extends JFrame {
 	private JButton btnConsultarSaldo;
@@ -16,10 +13,10 @@ public class MenuPrincipal extends JFrame {
 	private JButton btnCambiarPIN;
 	private JButton btnSalir;
 
-	private int usuarioId;
+	private AppBl appBl;
 
-	public MenuPrincipal(int id) {
-		usuarioId = id;
+	public MenuPrincipal(AppBl appBl) {
+		this.appBl = appBl;
 
 		setTitle("Menú Principal");
 		setBounds(100, 100, 450, 350);
@@ -83,53 +80,27 @@ public class MenuPrincipal extends JFrame {
 	}
 
 	private void consultarSaldo() {
-		Conexion con = new Conexion();
-		Connection connection = null;
-		double saldo = 0;
-
-		try {
-			connection = (Connection) con.getConnection();
-		} catch (SQLException e) {
-			System.err.println("No se puede conectar a Base de Datos");
-			e.printStackTrace();
-			System.exit(1);
-		}
-
-		try {
-			String query = "SELECT * FROM usuarios WHERE id = ?";
-			PreparedStatement preparedStatement = connection.prepareStatement(query);
-			preparedStatement.setInt(1, usuarioId);
-			ResultSet resultSet = preparedStatement.executeQuery();
-
-			if (resultSet.next()) {
-				saldo = resultSet.getDouble("saldo");
-			} else {
-				throw new SQLException();
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		JOptionPane.showMessageDialog(this, "Su saldo actual es: $" + String.format("%.2f", saldo) + ".",
+		BigDecimal saldoAMostrar = appBl.getSaldo();
+		JOptionPane.showMessageDialog(this, "Su saldo actual es: $" + String.format("%.2f", saldoAMostrar) + ".",
 				"Consulta de saldo", JOptionPane.INFORMATION_MESSAGE);
 	}
 
 	private void llamarADeposito() {
-		Deposito frame = new Deposito(usuarioId);
+		Deposito frame = new Deposito(appBl);
 		frame.setVisible(true);
 		frame.setLocationRelativeTo(null);
 		this.dispose();
 	}
 
 	private void llamarARetiro() {
-		Retiro frame = new Retiro(usuarioId);
+		Retiro frame = new Retiro(appBl);
 		frame.setVisible(true);
 		frame.setLocationRelativeTo(null);
 		this.dispose();
 	}
 
 	private void llamarACambioPIN() {
-		CambioPIN frame = new CambioPIN(usuarioId);
+		CambioPIN frame = new CambioPIN(appBl);
 		frame.setVisible(true);
 		frame.setLocationRelativeTo(null);
 		this.dispose();

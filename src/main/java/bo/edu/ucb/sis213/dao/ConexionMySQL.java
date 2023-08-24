@@ -1,10 +1,10 @@
-package bo.edu.ucb.sis213.bbdd;
+package bo.edu.ucb.sis213.dao;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-public class Conexion {
+public class ConexionMySQL {
 	private final String HOST = "127.0.0.1";
 	private final int PORT = 3306;
 	private final String USER = "root";

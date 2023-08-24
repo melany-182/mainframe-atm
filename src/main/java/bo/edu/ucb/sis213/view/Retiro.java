@@ -1,12 +1,9 @@
-package bo.edu.ucb.sis213.ui;
+package bo.edu.ucb.sis213.view;
 
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.math.BigDecimal;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -17,17 +14,17 @@ import javax.swing.text.AbstractDocument;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DocumentFilter;
-import bo.edu.ucb.sis213.bbdd.Conexion;
+import bo.edu.ucb.sis213.bl.AppBl;
 
 public class Retiro extends JFrame {
 	private JTextField txtCantidad;
 	private JButton btnCancelar;
 	private JButton btnRetirar;
 
-	private int usuarioId;
+	private AppBl appBl;
 
-	public Retiro(int id) {
-		usuarioId = id;
+	public Retiro(AppBl appBl) {
+		this.appBl = appBl;
 
 		setTitle("Realizar Retiro");
 		setBounds(100, 100, 450, 350);
@@ -110,86 +107,36 @@ public class Retiro extends JFrame {
 	}
 
 	private void llamarAMenuPrincipal() {
-		MenuPrincipal frame = new MenuPrincipal(usuarioId);
+		MenuPrincipal frame = new MenuPrincipal(appBl);
 		frame.setVisible(true);
 		frame.setLocationRelativeTo(null);
 		this.dispose();
 	}
 
 	private void realizarRetiro() {
-		double cantidad = Double.parseDouble(txtCantidad.getText());
-		Conexion con = new Conexion();
-		Connection connection = null;
-		double saldo = 0;
-
+		BigDecimal cantidad = new BigDecimal(txtCantidad.getText());
+		
 		try {
-			connection = (Connection) con.getConnection();
-		} catch (SQLException e) {
-			System.err.println("No se puede conectar a Base de Datos");
-			e.printStackTrace();
-			System.exit(1);
-		}
-
-		try {
-			String query = "SELECT * FROM usuarios WHERE id = ?";
-			PreparedStatement preparedStatement = connection.prepareStatement(query);
-			preparedStatement.setInt(1, usuarioId);
-			ResultSet resultSet = preparedStatement.executeQuery();
-
-			if (resultSet.next()) {
-				saldo = resultSet.getDouble("saldo");
-			} else {
-				throw new SQLException();
-			}
-
-			if (cantidad <= 0) {
-				JOptionPane.showMessageDialog(this, "La cantidad ingresada no es válida.", "Cantidad inválida",
-						JOptionPane.INFORMATION_MESSAGE);
-			} else {
-				if (cantidad > saldo) {
-					JOptionPane.showMessageDialog(this, "Error al realizar el retiro. Saldo insuficiente.",
-							"Retiro fallido", JOptionPane.INFORMATION_MESSAGE);
-				} else {
-					// actualización de saldo
-					query = "UPDATE usuarios SET saldo = saldo - ? WHERE id = ?";
-					preparedStatement = connection.prepareStatement(query);
-					preparedStatement.setDouble(1, cantidad);
-					preparedStatement.setInt(2, usuarioId);
-					preparedStatement.executeUpdate();
-					preparedStatement.close();
-
-					// registro en histórico
-					query = "INSERT INTO historico(usuario_id, tipo_operacion, cantidad) VALUES (?, 'retiro', ?)";
-					preparedStatement = connection.prepareStatement(query);
-					preparedStatement.setInt(1, usuarioId);
-					preparedStatement.setDouble(2, cantidad);
-					preparedStatement.executeUpdate();
-					preparedStatement.close();
-
-					query = "SELECT * FROM usuarios WHERE id = ?";
-					preparedStatement = connection.prepareStatement(query);
-					preparedStatement.setInt(1, usuarioId);
-					resultSet = preparedStatement.executeQuery();
-
-					if (resultSet.next()) {
-						saldo = resultSet.getDouble("saldo");
-					} else {
-						throw new SQLException();
-					}
-
-					txtCantidad.setText("");
-					JOptionPane.showMessageDialog(this,
-							"Retiro realizado con éxito. Su nuevo saldo es: $" + String.format("%.2f", saldo) + ".",
-							"Retiro exitoso", JOptionPane.INFORMATION_MESSAGE);
-					MenuPrincipal frame = new MenuPrincipal(usuarioId);
-					frame.setVisible(true);
-					frame.setLocationRelativeTo(null);
-					this.dispose();
-				}
-			}
-
+			appBl.realizarRetiro(cantidad);
+			txtCantidad.setText("");
+			JOptionPane.showMessageDialog(this,
+					"Retiro realizado con éxito. Su nuevo saldo es: $" + String.format("%.2f", appBl.getSaldo()) + ".",
+					"Retiro exitoso", JOptionPane.INFORMATION_MESSAGE);
+					
+			MenuPrincipal frame = new MenuPrincipal(appBl);
+			frame.setVisible(true);
+			frame.setLocationRelativeTo(null);
+			this.dispose();
 		} catch (Exception e) {
-			e.printStackTrace();
+			// TODO: gestionar JOptionPane's
+			JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 		}
+		/*
+			JOptionPane.showMessageDialog(this, "La cantidad ingresada no es válida.", "Cantidad inválida",
+				JOptionPane.INFORMATION_MESSAGE);
+
+			JOptionPane.showMessageDialog(this, "Error al realizar el retiro. Saldo insuficiente.",
+				"Retiro fallido", JOptionPane.INFORMATION_MESSAGE);
+		*/
 	}
 }
